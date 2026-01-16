@@ -35,6 +35,156 @@
             overflow-x: hidden;
         }
 
+        /* Admin Panel Styles */
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1001;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .admin-btn:hover {
+            background: #2a2a3e;
+            transform: translateY(-2px);
+        }
+
+        .admin-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .admin-modal {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.5s ease-out;
+            border: 3px solid var(--primary);
+        }
+
+        .admin-title {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .admin-section {
+            margin-bottom: 25px;
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .admin-section-title {
+            color: var(--dark);
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-input-group {
+            margin-bottom: 15px;
+        }
+
+        .admin-label {
+            display: block;
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5ee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .admin-button {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .save-btn {
+            background: linear-gradient(to right, var(--success), #00d4aa);
+            color: white;
+        }
+
+        .reset-btn {
+            background: linear-gradient(to right, var(--accent), #ff4b2b);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #f1f3f9;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: linear-gradient(to right, #666, #888);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
         /* Telegram Popup Modal */
         .modal-overlay {
             position: fixed;
@@ -706,6 +856,14 @@
             .participants-list {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
+            
+            .admin-modal {
+                padding: 20px;
+            }
+            
+            .admin-buttons {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -724,10 +882,87 @@
             .form-buttons {
                 flex-direction: column;
             }
+            
+            .admin-btn {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Admin Button -->
+    <button class="admin-btn" id="adminBtn">
+        <i class="fas fa-user-shield"></i> Admin
+    </button>
+
+    <!-- Admin Panel Modal -->
+    <div class="admin-modal-overlay" id="adminModal">
+        <div class="admin-modal">
+            <h2 class="admin-title">
+                <i class="fas fa-user-shield"></i> Admin Panel
+            </h2>
+            
+            <!-- Password Section (shown first) -->
+            <div class="admin-section" id="passwordSection">
+                <h3 class="admin-section-title">
+                    <i class="fas fa-lock"></i> Admin Login
+                </h3>
+                <div class="admin-input-group">
+                    <label class="admin-label">Enter Admin Password</label>
+                    <input type="password" id="adminPassword" class="admin-input" placeholder="Enter password ">
+                </div>
+                <div class="admin-buttons">
+                    <button class="admin-button save-btn" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button class="admin-button cancel-btn" id="closeAdminBtn">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Admin Controls (hidden by default) -->
+            <div class="admin-section" id="adminControls" style="display: none;">
+                <h3 class="admin-section-title">
+                    <i class="fas fa-trophy"></i> Change Prizes
+                </h3>
+                <div class="admin-input-group">
+                    <label class="admin-label">1st Prize</label>
+                    <input type="text" id="prize1" class="admin-input" placeholder="Enter 1st prize">
+                </div>
+                <div class="admin-input-group">
+                    <label class="admin-label">2nd Prize</label>
+                    <input type="text" id="prize2" class="admin-input" placeholder="Enter 2nd prize">
+                </div>
+                <div class="admin-input-group">
+                    <label class="admin-label">3rd Prize</label>
+                    <input type="text" id="prize3" class="admin-input" placeholder="Enter 3rd prize">
+                </div>
+                
+                <h3 class="admin-section-title" style="margin-top: 25px;">
+                    <i class="fas fa-database"></i> Data Management
+                </h3>
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                    Warning: This will delete all participants and votes. Use this to start a new voting session.
+                </p>
+                
+                <div class="admin-buttons">
+                    <button class="admin-button save-btn" id="savePrizesBtn">
+                        <i class="fas fa-save"></i> Save Prizes
+                    </button>
+                    <button class="admin-button reset-btn" id="clearDataBtn">
+                        <i class="fas fa-trash-alt"></i> Clear All Data
+                    </button>
+                </div>
+                
+                <button class="admin-button logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Telegram Join Modal -->
     <div id="telegramModal" class="modal-overlay">
         <div class="modal-content">
@@ -790,7 +1025,7 @@
                 <div class="winner-medal medal-1">1st</div>
                 <h3 class="winner-name" id="winner1Name">No Participant Yet</h3>
                 <div class="winner-votes"><i class="fas fa-fire"></i> <span id="winner1Votes">0</span> Votes</div>
-                <div class="winner-price">2 HACK KEY</div>
+                <div class="winner-price" id="prize1Display">₹100 Free Deposit</div>
                 <div id="congrats1" class="congrats-badge" style="display: none;">🎉 Congratulations! You are 1st</div>
                 <p class="no-winner">Be the first to participate!</p>
             </div>
@@ -799,7 +1034,7 @@
                 <div class="winner-medal medal-2">2nd</div>
                 <h3 class="winner-name" id="winner2Name">No Participant Yet</h3>
                 <div class="winner-votes"><i class="fas fa-fire"></i> <span id="winner2Votes">0</span> Votes</div>
-                <div class="winner-price">NEW HACK KEY+40 UPI</div>
+                <div class="winner-price" id="prize2Display">₹55 UPI Cash</div>
                 <div id="congrats2" class="congrats-badge" style="display: none;">🎉 Congratulations! You are 2nd</div>
                 <p class="no-winner">Be the first to participate!</p>
             </div>
@@ -808,7 +1043,7 @@
                 <div class="winner-medal medal-3">3rd</div>
                 <h3 class="winner-name" id="winner3Name">No Participant Yet</h3>
                 <div class="winner-votes"><i class="fas fa-fire"></i> <span id="winner3Votes">0</span> Votes</div>
-                <div class="winner-price">PREDICTION BOT 1000 PAID COIN</div>
+                <div class="winner-price" id="prize3Display">₹30 UPI Cash</div>
                 <div id="congrats3" class="congrats-badge" style="display: none;">🎉 Congratulations! You are 3rd</div>
                 <p class="no-winner">Be the first to participate!</p>
             </div>
@@ -893,6 +1128,8 @@
         const telegramLink = "https://t.me/+8GtO9R-G56k5OTE1";
         let myParticipantId = localStorage.getItem('myParticipantId');
         let lastUpdateTime = Date.now();
+        let isAdminLoggedIn = false;
+        const ADMIN_PASSWORD = "456";
 
         // DOM Elements
         const telegramModal = document.getElementById('telegramModal');
@@ -908,54 +1145,21 @@
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareBtn = document.getElementById('shareBtn');
         const liveUpdate = document.getElementById('liveUpdate');
-
-        // Clear all existing data from Firebase
-        function clearAllData() {
-            console.log("Clearing all existing data...");
-            
-            // Remove all participants
-            database.ref('participants').remove()
-                .then(() => {
-                    console.log("All participants removed successfully!");
-                })
-                .catch((error) => {
-                    console.error("Error removing participants:", error);
-                });
-            
-            // Reset contest settings
-            const resetSettings = {
-                startTime: Date.now(),
-                endTime: getToday9PM(),
-                totalParticipants: 0,
-                totalVotes: 0,
-                lastUpdated: Date.now()
-            };
-            
-            database.ref('contestSettings').set(resetSettings)
-                .then(() => {
-                    console.log("Contest settings reset successfully!");
-                })
-                .catch((error) => {
-                    console.error("Error resetting contest settings:", error);
-                });
-            
-            // Clear local storage
-            localStorage.removeItem('userVoted');
-            localStorage.removeItem('userVoteFor');
-            localStorage.removeItem('myParticipantId');
-            
-            // Reset local variables
-            participants = [];
-            userVoted = false;
-            userVoteFor = null;
-            myParticipantId = null;
-            
-            // Update UI
-            updateParticipantsUI();
-            updateTopWinners();
-            
-            console.log("All data cleared successfully! New voting session started.");
-        }
+        
+        // Admin Panel Elements
+        const adminBtn = document.getElementById('adminBtn');
+        const adminModal = document.getElementById('adminModal');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeAdminBtn = document.getElementById('closeAdminBtn');
+        const passwordSection = document.getElementById('passwordSection');
+        const adminControls = document.getElementById('adminControls');
+        const prize1Input = document.getElementById('prize1');
+        const prize2Input = document.getElementById('prize2');
+        const prize3Input = document.getElementById('prize3');
+        const savePrizesBtn = document.getElementById('savePrizesBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
 
         // Telegram Popup Logic
         function checkTelegramJoin() {
@@ -981,9 +1185,6 @@
 
         // Initialize the app
         function initApp() {
-            // Clear all existing data FIRST
-            clearAllData();
-            
             // Generate a unique ID for this user/device
             let userId = localStorage.getItem('voteContestUserId');
             if (!userId) {
@@ -1039,14 +1240,9 @@
             
             // Check URL for referral
             checkReferral();
-        }
-
-        // Get today's 9 PM timestamp
-        function getToday9PM() {
-            const now = new Date();
-            const today9PM = new Date(now);
-            today9PM.setHours(21, 0, 0, 0); // 9 PM
-            return today9PM.getTime();
+            
+            // Load prizes from Firebase
+            loadPrizes();
         }
 
         // Load contest settings and initial data
@@ -1075,6 +1271,51 @@
             };
             
             database.ref('contestSettings').set(settings);
+        }
+
+        // Load prizes from Firebase
+        function loadPrizes() {
+            database.ref('prizes').once('value').then((snapshot) => {
+                const prizes = snapshot.val();
+                if (prizes) {
+                    // Update prize displays
+                    document.getElementById('prize1Display').textContent = prizes.first || '₹100 Free Deposit';
+                    document.getElementById('prize2Display').textContent = prizes.second || '₹55 UPI Cash';
+                    document.getElementById('prize3Display').textContent = prizes.third || '₹30 UPI Cash';
+                    
+                    // Update admin panel inputs
+                    prize1Input.value = prizes.first || '₹100 Free Deposit';
+                    prize2Input.value = prizes.second || '₹55 UPI Cash';
+                    prize3Input.value = prizes.third || '₹30 UPI Cash';
+                } else {
+                    // Set default prizes
+                    const defaultPrizes = {
+                        first: '₹100 Free Deposit',
+                        second: '₹55 UPI Cash',
+                        third: '₹30 UPI Cash'
+                    };
+                    
+                    database.ref('prizes').set(defaultPrizes);
+                    
+                    // Update displays
+                    document.getElementById('prize1Display').textContent = defaultPrizes.first;
+                    document.getElementById('prize2Display').textContent = defaultPrizes.second;
+                    document.getElementById('prize3Display').textContent = defaultPrizes.third;
+                    
+                    // Update admin panel inputs
+                    prize1Input.value = defaultPrizes.first;
+                    prize2Input.value = defaultPrizes.second;
+                    prize3Input.value = defaultPrizes.third;
+                }
+            });
+        }
+
+        // Get today's 9 PM timestamp
+        function getToday9PM() {
+            const now = new Date();
+            const today9PM = new Date(now);
+            today9PM.setHours(21, 0, 0, 0); // 9 PM
+            return today9PM.getTime();
         }
 
         // Set up real-time listeners for live updates
@@ -1116,6 +1357,24 @@
                     participants = [];
                     updateParticipantsUI();
                     updateTopWinners();
+                }
+            });
+            
+            // Listen for prize updates
+            database.ref('prizes').on('value', (snapshot) => {
+                const prizes = snapshot.val();
+                if (prizes) {
+                    // Update prize displays
+                    document.getElementById('prize1Display').textContent = prizes.first;
+                    document.getElementById('prize2Display').textContent = prizes.second;
+                    document.getElementById('prize3Display').textContent = prizes.third;
+                    
+                    // Update admin panel inputs if admin is logged in
+                    if (isAdminLoggedIn) {
+                        prize1Input.value = prizes.first;
+                        prize2Input.value = prizes.second;
+                        prize3Input.value = prizes.third;
+                    }
                 }
             });
         }
@@ -1438,6 +1697,128 @@
             }
         }
 
+        // Admin Panel Functions
+        adminBtn.addEventListener('click', function() {
+            adminModal.style.display = 'flex';
+            passwordSection.style.display = 'block';
+            adminControls.style.display = 'none';
+            adminPasswordInput.value = '';
+            adminPasswordInput.focus();
+        });
+
+        closeAdminBtn.addEventListener('click', function() {
+            adminModal.style.display = 'none';
+            isAdminLoggedIn = false;
+        });
+
+        loginBtn.addEventListener('click', function() {
+            const password = adminPasswordInput.value.trim();
+            
+            if (password === ADMIN_PASSWORD) {
+                // Login successful
+                isAdminLoggedIn = true;
+                passwordSection.style.display = 'none';
+                adminControls.style.display = 'block';
+                
+                // Load current prizes into input fields
+                database.ref('prizes').once('value').then((snapshot) => {
+                    const prizes = snapshot.val();
+                    if (prizes) {
+                        prize1Input.value = prizes.first;
+                        prize2Input.value = prizes.second;
+                        prize3Input.value = prizes.third;
+                    }
+                });
+                
+                alert('Admin login successful!');
+            } else {
+                alert('Incorrect password! Please try again.');
+                adminPasswordInput.value = '';
+                adminPasswordInput.focus();
+            }
+        });
+
+        logoutBtn.addEventListener('click', function() {
+            isAdminLoggedIn = false;
+            adminModal.style.display = 'none';
+            alert('Logged out from admin panel.');
+        });
+
+        savePrizesBtn.addEventListener('click', function() {
+            if (!isAdminLoggedIn) {
+                alert('Please login as admin first!');
+                return;
+            }
+            
+            const prize1 = prize1Input.value.trim();
+            const prize2 = prize2Input.value.trim();
+            const prize3 = prize3Input.value.trim();
+            
+            if (!prize1 || !prize2 || !prize3) {
+                alert('Please fill all prize fields!');
+                return;
+            }
+            
+            // Save prizes to Firebase
+            const prizes = {
+                first: prize1,
+                second: prize2,
+                third: prize3
+            };
+            
+            database.ref('prizes').set(prizes)
+                .then(() => {
+                    alert('Prizes updated successfully!');
+                })
+                .catch((error) => {
+                    alert('Error updating prizes: ' + error.message);
+                });
+        });
+
+        clearDataBtn.addEventListener('click', function() {
+            if (!isAdminLoggedIn) {
+                alert('Please login as admin first!');
+                return;
+            }
+            
+            if (confirm('⚠️ WARNING: This will delete ALL participants and votes! Are you sure you want to clear all data?')) {
+                // Clear all participants from Firebase
+                database.ref('participants').remove()
+                    .then(() => {
+                        // Reset contest statistics
+                        database.ref('contestSettings').transaction((settings) => {
+                            if (settings) {
+                                settings.totalParticipants = 0;
+                                settings.totalVotes = 0;
+                                settings.lastUpdated = Date.now();
+                            }
+                            return settings;
+                        });
+                        
+                        // Clear local storage for all users
+                        localStorage.removeItem('userVoted');
+                        localStorage.removeItem('userVoteFor');
+                        localStorage.removeItem('myParticipantId');
+                        localStorage.removeItem('hasClearedParticipants');
+                        
+                        // Reset global variables
+                        participants = [];
+                        userVoted = false;
+                        userVoteFor = null;
+                        myParticipantId = null;
+                        
+                        // Update UI
+                        updateParticipantsUI();
+                        updateTopWinners();
+                        
+                        alert('✅ All data cleared successfully! New voting session is ready.');
+                    })
+                    .catch((error) => {
+                        alert('Error clearing data: ' + error.message);
+                    });
+            }
+        });
+
         // Initialize the app when page loads
         window.addEventListener('DOMContentLoaded', function() {
             checkTelegramJoin();
@@ -1451,6 +1832,13 @@
             participantNameInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     confirmParticipateBtn.click();
+                }
+            });
+            
+            // Allow enter key to submit admin password
+            adminPasswordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginBtn.click();
                 }
             });
         });
